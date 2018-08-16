@@ -17,8 +17,8 @@ ble = Adafruit_BluefruitLE.get_provider()
 def main():
         
     import os
-    f = open('data.txt', 'a', os.O_NONBLOCK)    
-        
+    f = open('data.txt', 'a', os.O_NONBLOCK)
+           
     
     # Clear any cached data because both bluez and CoreBluetooth have issues with
     # caching data and it going stale.
@@ -69,6 +69,7 @@ def main():
 
         # Now wait up to one minute to receive data from the device.
         print('Waiting up to 60 seconds to receive data from the device...')
+        wtr = ""
         while 1:
                 received = uart.read(timeout_sec=60)
                 if received is not None:
@@ -76,16 +77,24 @@ def main():
                         inputString = format(received)
                         newData =  inputString.strip().split(',')
 
+                        g = open('value.txt', 'r', os.O_NONBLOCK)
+                        gLines = g.readlines()
+
                         if newData[0] == 'A':
                             if len(newData) == 5:
                                 wrt = newData[1] + "," + newData[2] + "," + newData[3] + "," + newData[4] + ","
-                                f.write(wrt)
-                                f.flush()
+                                #f.write(wrt)
+                                #f.flush()
                         elif newData[0] == 'B':
                             if len(newData) == 4:
-                                wrt = newData[1] + "," + newData[2] + "," + newData[3] + "\n"
+                                wrt = wtr + newData[1] + "," + newData[2] + "," + newData[3] + "\n"
                                 f.write(wrt)
                                 f.flush()
+
+                                gLines[0] = wrt
+                                g = open('value.txt', 'w')
+                                g.writelines(gLines)
+                                g.close()
                         
                         print('Received: {0}'.format(received))
                 else:

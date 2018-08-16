@@ -76,21 +76,35 @@ backMax = 0
 
 
 while 1:
-
+#for i in range(10):
         while 1:
-                f = open('data.txt', 'r', os.O_NONBLOCK)
+                f = open('value.txt', 'r')#, os.O_NONBLOCK)
                 lines = f.readlines()
-                received = lines[len(lines)-2]
+                if len(lines) > 0:
+                        received = lines[0]
         
-                inputString = received
+                        inputString = received
        
-                newData =  inputString.strip().split(',')
+                        newData =  inputString.strip().split(',')
 
-                if len(newData) == 7:
-                        break
+                        if len(newData) == 7:
+                                break
         
         flexAngle = int(newData[0])
+        # some realistic filters based on expected max and mins
+        if flexAngle > 180:
+                flexAngle = 180
+        elif flexAngle < 40:
+                flexAngle = 40
+        
         versionAngle = int(newData[1])
+        
+        # some realistic filters based on expected max and mins
+        #if versionAngle > 40:
+        #        versionAngle = 40
+        #elif versionAngle < -40:
+        #        versionAngle = -40
+        
         newFront = int(newData[2])
         newBack = int(newData[3])
         newMuscle = int(newData[4])
@@ -98,17 +112,18 @@ while 1:
         steps = int(newData[6])
         
 
-        if flexAngle > dorsiMax:
-                dorsiMax = flexAngle
+        if flexAngle > 90:
+                plantarMax = flexAngle - 90
         
-        if flexAngle < plantarMax:
-                plantarMax = flexAngle
+        if flexAngle < 90:
+                dorsiMax = 90 - flexAngle
         
-        if versionAngle > inversionMax:
+        # will probably have to adjust this once i get to school
+        if versionAngle > 0:
+                eversionMax = abs(versionAngle)
+        
+        if versionAngle < 0:
                 inversionMax = versionAngle
-        
-        if versionAngle < eversionMax:
-                eversionMax = versionAngle
         
         if newFront > frontMax:
                 frontMax = newFront
@@ -123,7 +138,7 @@ while 1:
         r = [0,1]
          
         title = 'Flexion: ' + str(flexAngle)
-        if flexAngle < 30 or flexAngle > 130:
+        if flexAngle < 60 or flexAngle > 130:
                 flexColor = 'red'
         else:
                 flexColor = 'green'  
@@ -141,7 +156,7 @@ while 1:
         ax2.grid(False)
         
         title = 'In/Eversion: ' + str(versionAngle)
-        if versionAngle > 40 or versionAngle < -40:
+        if versionAngle > 20 or versionAngle < -20:
                 versionColor = 'red'
         else:
                 versionColor = 'green'
@@ -164,12 +179,14 @@ while 1:
         ax8.clear()
         ax8.plot(frontData, color='black')
         ax8.set_title('Front Foot Load')
+        x1,x2,y1,y2 = ax8.axis()
+        ax8.axis((x1,x2,0,150))
         
-        if newFront < 10:
+        if newFront < 20:
                 ax6.imshow(F1)
-        elif newFront < 20:
+        elif newFront < 50:
                 ax6.imshow(F2)
-        elif newFront < 30:
+        elif newFront < 60:
                 ax6.imshow(F3)
         else:
                 ax6.imshow(F4)
@@ -181,12 +198,14 @@ while 1:
         ax9.clear()
         ax9.plot(backData, color='black')
         ax9.set_title('Back Foot Load')
+        x1,x2,y1,y2 = ax9.axis()
+        ax9.axis((x1,x2,0,150))
         
-        if newBack < 10:
+        if newBack < 20:
                 ax7.imshow(B1)
-        elif newBack < 20:
+        elif newBack < 50:
                 ax7.imshow(B2)
-        elif newBack < 30:
+        elif newBack < 60:
                 ax7.imshow(B3)
         else:
                 ax7.imshow(B4)
@@ -197,6 +216,8 @@ while 1:
         ax11.clear()
         ax11.plot(muscleData, color='black')
         ax11.set_title('Muscle Activity')
+        x1,x2,y1,y2 = ax11.axis()
+        ax11.axis((x1,x2,0,100))
         
      
         if batteryLevel > 75:
@@ -212,15 +233,15 @@ while 1:
         
         ax10.text(0,0.8, 'Dorsi: ' + str(dorsiMax), fontsize=9)
         ax10.text(0,0.6, 'Plantar: ' +str(plantarMax), fontsize=9)
-        ax10.text(0,0.4, 'Inversion: ' + str(inversionMax), fontsize=9)
-        ax10.text(0,0.2, 'Eversion: ' + str(eversionMax), fontsize=9)
+        ax10.text(0,0.4, 'Inversion: ' + str(abs(inversionMax)), fontsize=9)
+        ax10.text(0,0.2, 'Eversion: ' + str(abs(eversionMax)), fontsize=9)
         ax10.text(0.5,0.8, 'Muscle Activity: ' + str(muscleMax), fontsize=9)
         ax10.text(0.5,0.6, 'Front Foot Load: ' + str(frontMax), fontsize=9)
         ax10.text(0.5,0.4, 'Back Foot Load: ' + str(backMax), fontsize=9)
         ax10.text(0.5,0.2, 'Steps: ' + str(steps), fontsize=9)
                 
         plt.tight_layout()
-        #plt.draw()
+        plt.draw()
         plt.pause(1e-17)
 
 plt.show()
