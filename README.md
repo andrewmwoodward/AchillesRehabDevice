@@ -1,5 +1,4 @@
 
-#Achilles Tendon Rehab Device
 
 Achilles Tendon Rehab Device
 
